@@ -1,0 +1,24 @@
+flowchart LR
+  User[Registered User] -->|Registration, login, profile input| Identity(1. Identity and access)
+  Identity -->|Account and session records| IdentityStore[(identity schema)]
+  IdentityStore -->|Identity and authorization data| Identity
+  Identity -->|Owned user context| Interview(2. Interview practice)
+  User -->|Category, locale, text answer| Interview
+  ContentStore[(content schema)] -->|Published questions, rubric and AI config versions| Interview
+  Interview -->|Session, question and answer| InterviewStore[(interview schema)]
+  InterviewStore -->|Own history and answer context| Interview
+  Interview -->|Question and history| User
+  Interview -->|Evaluation job and outbox event| EvalStore[(evaluation and platform schemas)]
+  EvalStore -->|Queued job and answer reference| Evaluate(3. Evaluate answer)
+  InterviewStore -->|Question and answer text| Evaluate
+  ContentStore -->|Pinned rubric and AI config| Evaluate
+  Evaluate -->|Scoped evaluation payload| LLM[Hosted LLM provider]
+  LLM -->|Untrusted candidate| Evaluate
+  Evaluate -->|Validated result or review/failure state| EvalStore
+  User -->|Status and feedback request| Feedback(4. Read evaluation)
+  EvalStore -->|Job state and approved feedback| Feedback
+  Feedback -->|Status, rubric scores and evidence-based feedback| User
+  User -->|Consent or data-rights request| Privacy(5. Privacy requests)
+  Privacy -->|Notice, consent event, request state| PrivacyStore[(privacy schema)]
+  PrivacyStore -->|Recorded request and consent state| Privacy
+  Privacy -->|Request status| User

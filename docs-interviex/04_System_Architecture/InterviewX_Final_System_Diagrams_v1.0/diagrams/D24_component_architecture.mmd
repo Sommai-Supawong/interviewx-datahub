@@ -1,0 +1,23 @@
+flowchart LR
+  Web[Next.js Web] -->|Public REST /v1| API[NestJS Core API / BFF]
+  subgraph Core[NestJS Core — one modular monolith]
+    Identity[Identity / Access]
+    Content[Content]
+    Interview[Interview]
+    Evaluation[Evaluation read model and appeals]
+    Privacy[Privacy]
+    Platform[Platform: idempotency, outbox, audit]
+  end
+  API --> Identity & Content & Interview & Evaluation & Privacy
+  Interview -->|Exported application contract| Identity
+  Interview -->|Published question and version contract| Content
+  Interview -->|Atomic submission contract| Platform
+  Evaluation -->|Owned answer reference| Interview
+  Evaluation -->|Job and audit contract| Platform
+  Privacy -->|User identity contract| Identity
+  Identity & Content & Interview & Evaluation & Privacy & Platform -->|Owning repository only| PG[(Core PostgreSQL, schema per context)]
+  Platform -->|Outbox dispatch| Queue[(Redis / BullMQ)]
+  Queue --> Worker[Evaluation Worker]
+  Worker -->|Sanctioned job/result persistence adapter| PG
+  Worker -->|Authenticated /internal/v1/evaluate| AI[FastAPI Inference]
+  AI -->|Provider adapter| LLM[Hosted LLM provider]

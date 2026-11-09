@@ -1,0 +1,55 @@
+classDiagram
+  class User {
+    +UUID id
+    +string email
+    +string accountStatus
+  }
+  class InterviewSession {
+    +UUID id
+    +string interviewType
+    +string locale
+    +string status
+    +datetime startedAt
+  }
+  class SessionQuestion {
+    +UUID id
+    +int sequenceNo
+    +string questionText
+  }
+  class Answer {
+    +UUID id
+    +int attemptNumber
+    +string answerText
+    +datetime answeredAt
+  }
+  class EvaluationJob {
+    +UUID id
+    +string state
+    +int attempts
+  }
+  class Feedback {
+    +UUID id
+    +number score
+    +map dimensionScores
+    +list evidence
+    +string status
+  }
+  class RubricVersion {
+    +UUID id
+    +string version
+    +map criteria
+  }
+  class AiConfigVersion {
+    +UUID id
+    +string version
+    +string modelIdentifier
+  }
+  User "1" --> "0..*" InterviewSession : starts
+  InterviewSession "1" *-- "0..*" SessionQuestion : contains
+  SessionQuestion "1" *-- "0..*" Answer : receives
+  Answer "1" --> "0..1" EvaluationJob : queues
+  EvaluationJob "1" --> "0..1" Feedback : produces
+  InterviewSession "0..*" --> "1" RubricVersion : pins
+  InterviewSession "0..*" --> "1" AiConfigVersion : pins
+  Feedback "0..*" --> "1" RubricVersion : scoredWith
+  Feedback "0..*" --> "1" AiConfigVersion : evaluatedWith

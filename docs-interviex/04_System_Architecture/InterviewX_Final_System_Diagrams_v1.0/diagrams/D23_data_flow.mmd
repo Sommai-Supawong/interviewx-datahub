@@ -1,0 +1,5 @@
+flowchart LR
+  User[Registered User] -->|Account, interview choices, text answers, privacy requests| Platform(InterviewX R1 platform)
+  Platform -->|Questions, evaluation status, feedback, history, request status| User
+  Platform -->|Scoped question, answer, rubric and model request| LLM[Hosted LLM provider]
+  LLM -->|Untrusted evaluation candidate| Platform

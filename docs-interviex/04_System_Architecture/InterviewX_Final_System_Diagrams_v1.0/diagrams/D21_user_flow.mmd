@@ -1,0 +1,23 @@
+flowchart TD
+  Entry[Web entry] --> Auth{Signed in?}
+  Auth -->|No| Access[Register or log in screen]
+  Access -->|Invalid input or credentials| Access
+  Access -->|Success| Home[Practice home]
+  Auth -->|Yes| Home
+  Home --> Setup[Interview setup: job type and locale]
+  Home --> History[Interview history]
+  Home --> Profile[Profile and privacy]
+  Setup -->|Start| Session[Text interview: question and answer]
+  Setup -->|Cancel| Home
+  Session -->|Invalid or empty answer| Session
+  Session -->|Submit accepted| Pending[Evaluation pending]
+  Pending -->|Still processing| Pending
+  Pending -->|Completed| Feedback[Rubric score and feedback]
+  Pending -->|Failed or needs review| Outcome[Status and next action]
+  Feedback -->|Next question| Session
+  Feedback -->|Appeal| Appeal[Feedback appeal]
+  Feedback -->|Finish| History
+  Outcome --> History
+  History -->|Open own session| Feedback
+  History --> Home
+  Profile --> Home

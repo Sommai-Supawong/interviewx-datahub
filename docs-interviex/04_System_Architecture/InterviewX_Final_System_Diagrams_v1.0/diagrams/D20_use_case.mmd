@@ -1,0 +1,23 @@
+flowchart LR
+  Guest([Guest])
+  User([Registered User])
+  Admin([System Admin])
+  LLM[External LLM provider]
+  subgraph IX[InterviewX R1 — proposed system boundary]
+    Register([Register])
+    Login([Log in])
+    Profile([Manage profile])
+    Practice([Start text interview])
+    Answer([Submit text answer])
+    Result([View evaluation and feedback])
+    History([View or delete interview history])
+    Appeal([Appeal feedback])
+    Privacy([Manage consent and data requests])
+    Content([Manage questions and publish rubrics])
+    Evaluate([Evaluate answer against rubric])
+  end
+  Guest --> Register & Login
+  User --> Profile & Practice & Answer & Result & History & Appeal & Privacy
+  Admin --> Content
+  Answer -. triggers .-> Evaluate
+  Evaluate --> LLM

@@ -1,0 +1,38 @@
+flowchart TD
+  Start([Start])
+  subgraph UserLane[Registered User]
+    Choose[Choose job interview and locale]
+    Write[Write and submit text answer]
+    See[View status or feedback]
+  end
+  subgraph WebLane[Web]
+    Show[Show question]
+    Pending[Show pending state and poll]
+  end
+  subgraph CoreLane[NestJS Core and Core PostgreSQL]
+    Create[Authorize and create session with pinned versions]
+    Check{Valid answer, ownership and active session?}
+    Reject[Return validation or authorization error]
+    Commit[Atomic answer, job, idempotency and outbox commit]
+    Read[Read owned evaluation status]
+    Store[Persist checked result and job transition]
+  end
+  subgraph WorkerLane[Evaluation Worker and AI]
+    Dispatch[Dispatch outbox via Redis/BullMQ]
+    Assess[Worker calls FastAPI; validate provider result]
+    Valid{Validated result?}
+    Retry{Transient error and attempts remain?}
+    Review[Mark needs_review or failed without invented score]
+  end
+  Start --> Choose --> Create --> Show --> Write --> Check
+  Check -->|No| Reject --> Write
+  Check -->|Yes| Commit --> Dispatch --> Assess --> Valid
+  Valid -->|Yes| Store
+  Valid -->|Invalid candidate| Review
+  Valid -->|Provider error| Retry
+  Retry -->|Yes| Assess
+  Retry -->|No| Review --> Store
+  Commit --> Pending --> Read
+  Read -->|Pending| Pending
+  Store --> Read
+  Read -->|Terminal state| See --> End([End or continue session])
